@@ -4,8 +4,8 @@
    Municipality of San Julian, Eastern Samar
    ============================================ */
 
-require_once 'includes/session.php';
-require_once 'includes/db.php';
+require_once 'authentication/session.php';
+require_once 'authentication/db_connect.php';
 
 // Only accept POST requests
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {

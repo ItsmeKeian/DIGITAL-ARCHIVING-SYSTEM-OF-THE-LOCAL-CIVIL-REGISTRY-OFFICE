@@ -1,4 +1,14 @@
+<?php
+/* ============================================
+   LCR DIGITAL ARCHIVING SYSTEM - LOGIN PAGE
+   Municipality of San Julian, Eastern Samar
+   ============================================ */
 
+require_once 'authentication/session.php';
+
+// Redirect to dashboard if already logged in
+redirectIfLoggedIn();
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
