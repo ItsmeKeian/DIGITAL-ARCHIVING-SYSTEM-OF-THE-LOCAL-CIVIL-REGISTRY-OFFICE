@@ -2,7 +2,7 @@
 // includes/header.php
 // Requires session to be started before including this file
 if (!isLoggedIn()) {
-    header('Location: ../index.php');
+    header('Location: .index.php');
     exit();
 }
 $current_page = basename($_SERVER['PHP_SELF'], '.php');

@@ -5,7 +5,7 @@
    ============================================ */
 
 require_once 'authentication/session.php';
-require_once 'authentication/db.php';
+require_once 'authentication/db_connect.php';
 
 requireLogin();
 
