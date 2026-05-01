@@ -13,8 +13,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit();
 }
 
-// Sanitize inputs
-$username = trim(mysqli_real_escape_string($conn, $_POST['username'] ?? ''));
+// Get inputs — no need for real_escape_string in PDO
+$username = trim($_POST['username'] ?? '');
 $password = trim($_POST['password'] ?? '');
 
 // Validate inputs
@@ -24,13 +24,11 @@ if (empty($username) || empty($password)) {
 }
 
 // Query the database
-$sql    = "SELECT id, username, password, full_name, role, status FROM users WHERE username = ? LIMIT 1";
-$stmt   = mysqli_prepare($conn, $sql);
-mysqli_stmt_bind_param($stmt, 's', $username);
-mysqli_stmt_execute($stmt);
-$result = mysqli_stmt_get_result($stmt);
+$stmt = $pdo->prepare("SELECT id, username, password, full_name, role, status FROM users WHERE username = ? LIMIT 1");
+$stmt->execute([$username]);
+$user = $stmt->fetch();
 
-if ($user = mysqli_fetch_assoc($result)) {
+if ($user) {
 
     // Check if account is active
     if ($user['status'] !== 'active') {
@@ -48,13 +46,8 @@ if ($user = mysqli_fetch_assoc($result)) {
         $_SESSION['role']      = $user['role'];
 
         // Log the login activity
-        $user_id    = $user['id'];
-        $action     = 'Logged in';
-        $ip_address = $_SERVER['REMOTE_ADDR'];
-        $log_sql    = "INSERT INTO audit_logs (user_id, action, ip_address, created_at) VALUES (?, ?, ?, NOW())";
-        $log_stmt   = mysqli_prepare($conn, $log_sql);
-        mysqli_stmt_bind_param($log_stmt, 'iss', $user_id, $action, $ip_address);
-        mysqli_stmt_execute($log_stmt);
+        $log = $pdo->prepare("INSERT INTO audit_logs (user_id, action, ip_address, created_at) VALUES (?, ?, ?, NOW())");
+        $log->execute([$user['id'], 'Logged in', $_SERVER['REMOTE_ADDR']]);
 
         echo json_encode([
             'status'   => 'success',
@@ -69,7 +62,4 @@ if ($user = mysqli_fetch_assoc($result)) {
 } else {
     echo json_encode(['status' => 'error', 'message' => 'Incorrect username or password.']);
 }
-
-mysqli_stmt_close($stmt);
-mysqli_close($conn);
 ?>
