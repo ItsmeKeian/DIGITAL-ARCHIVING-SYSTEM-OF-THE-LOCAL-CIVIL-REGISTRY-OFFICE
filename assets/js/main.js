@@ -5,35 +5,48 @@
 
    $(document).ready(function () {
 
-    // ── Sidebar Desktop Toggle ──
-    $('#sidebarToggle').on('click', function () {
-        $('#sidebar').toggleClass('collapsed');
-        $('#mainWrapper').toggleClass('collapsed');
-        const isCollapsed = $('#sidebar').hasClass('collapsed');
-        localStorage.setItem('sidebar_collapsed', isCollapsed);
-    });
-
-    // Restore sidebar state
+    // ── Restore sidebar state on page load ──
     if (localStorage.getItem('sidebar_collapsed') === 'true') {
         $('#sidebar').addClass('collapsed');
         $('#mainWrapper').addClass('collapsed');
     }
 
-    // ── Sidebar Mobile Toggle ──
-    $('#mobileSidebarToggle').on('click', function () {
-        $('#sidebar').addClass('mobile-open');
-        $('#sidebarOverlay').addClass('active');
+    // ── Sidebar inner toggle (hamburger inside sidebar header) ──
+    $(document).on('click', '#sidebarToggle', function (e) {
+        e.stopPropagation();
+        if (window.innerWidth > 900) {
+            $('#sidebar').toggleClass('collapsed');
+            $('#mainWrapper').toggleClass('collapsed');
+            localStorage.setItem('sidebar_collapsed', $('#sidebar').hasClass('collapsed'));
+        }
     });
 
-    $('#sidebarOverlay').on('click', function () {
+    // ── Topbar hamburger — handles BOTH desktop and mobile ──
+    $(document).on('click', '#mobileSidebarToggle', function (e) {
+        e.stopPropagation();
+        if (window.innerWidth <= 900) {
+            // Mobile — slide in/out with overlay
+            $('#sidebar').toggleClass('mobile-open');
+            $('#sidebarOverlay').toggleClass('active');
+        } else {
+            // Desktop — collapse/expand with localStorage
+            $('#sidebar').toggleClass('collapsed');
+            $('#mainWrapper').toggleClass('collapsed');
+            localStorage.setItem('sidebar_collapsed', $('#sidebar').hasClass('collapsed'));
+        }
+    });
+
+    // ── Close mobile sidebar when overlay is clicked ──
+    $(document).on('click', '#sidebarOverlay', function () {
         $('#sidebar').removeClass('mobile-open');
         $('#sidebarOverlay').removeClass('active');
     });
 
-    // ── Active nav link tooltip (collapsed sidebar) ──
-    $('.nav-link').each(function () {
-        const text = $(this).find('.nav-text').text().trim();
-        $(this).attr('data-tooltip', text);
+    // ── Confirm logout ──
+    $(document).on('click', 'a[href="logout.php"]', function (e) {
+        if (!confirm('Are you sure you want to logout?')) {
+            e.preventDefault();
+        }
     });
 
     // ── Auto-dismiss alerts ──
@@ -41,17 +54,4 @@
         $('.alert-auto-dismiss').fadeOut(400);
     }, 4000);
 
-    // ── Confirm delete dialogs ──
-    $(document).on('click', '.btn-delete', function (e) {
-        if (!confirm('Are you sure you want to delete this record? This action cannot be undone.')) {
-            e.preventDefault();
-        }
-    });
-
-    // ── Confirm logout ──
-    $('a[href="logout.php"]').on('click', function (e) {
-        if (!confirm('Are you sure you want to logout?')) {
-            e.preventDefault();
-        }
-    });
 });

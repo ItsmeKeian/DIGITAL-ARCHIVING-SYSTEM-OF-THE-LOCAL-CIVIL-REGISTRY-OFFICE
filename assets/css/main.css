@@ -544,6 +544,18 @@
        inset: 0; background: rgba(0,0,0,0.45);
        z-index: 99;
    }
+
+   .sidebar-toggle-btn {
+    display: none;
+}
+
+   .topbar-menu-btn {
+    background: none; border: none;
+    color: var(--gray-600); font-size: 1.1rem;
+    cursor: pointer;
+    padding: 4px;
+    display: block;
+}
    
    @media (max-width: 900px) {
        .sidebar { transform: translateX(-100%); width: var(--sidebar-width) !important; }
