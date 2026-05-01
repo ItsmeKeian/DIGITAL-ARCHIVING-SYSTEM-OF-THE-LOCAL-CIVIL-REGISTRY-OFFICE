@@ -1,21 +1,25 @@
 <?php
-// Database Configuration
+// authentication/db_connect.php
+
 define('DB_HOST', 'localhost');
+define('DB_NAME', 'lcr_system');
 define('DB_USER', 'root');
 define('DB_PASS', '');
-define('DB_NAME', 'lcr_system');
 
-// Create connection
-$conn = mysqli_connect(DB_HOST, DB_USER, DB_PASS, DB_NAME);
-
-// Check connection
-if (!$conn) {
-    die(json_encode([
-        'status' => 'error',
-        'message' => 'Database connection failed: ' . mysqli_connect_error()
-    ]));
+try {
+    $pdo = new PDO(
+        "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=utf8mb4",
+        DB_USER,
+        DB_PASS,
+        [
+            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::ATTR_EMULATE_PREPARES   => false,
+        ]
+    );
+} catch (PDOException $e) {
+    http_response_code(500);
+    echo json_encode(['status' => 'error', 'message' => 'Database connection failed.']);
+    exit();
 }
-
-// Set charset
-mysqli_set_charset($conn, 'utf8');
 ?>
