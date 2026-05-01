@@ -14,41 +14,40 @@ $full_name = $_SESSION['full_name'];
 $user_id   = $_SESSION['user_id'];
 
 // ── Fetch all birth records ──
-$search = isset($_GET['search']) ? trim($_GET['search']) : '';
-$filter_year = isset($_GET['year']) ? trim($_GET['year']) : '';
+$search      = isset($_GET['search']) ? trim($_GET['search']) : '';
+$filter_year = isset($_GET['year'])   ? trim($_GET['year'])   : '';
 
-$sql = "SELECT b.*, u.full_name as added_by 
-        FROM birth_records b 
-        LEFT JOIN users u ON b.created_by = u.id
-        WHERE 1=1";
+$sql    = "SELECT b.*, u.full_name as added_by 
+           FROM birth_records b 
+           LEFT JOIN users u ON b.created_by = u.id
+           WHERE 1=1";
+$params = [];
 
 if (!empty($search)) {
-    $s = mysqli_real_escape_string($conn, $search);
-    $sql .= " AND (b.child_first_name LIKE '%$s%' 
-               OR b.child_last_name LIKE '%$s%' 
-               OR b.registry_number LIKE '%$s%'
-               OR b.father_name LIKE '%$s%'
-               OR b.mother_name LIKE '%$s%')";
+    $sql .= " AND (b.child_first_name LIKE ? 
+               OR b.child_last_name  LIKE ? 
+               OR b.registry_number  LIKE ?
+               OR b.father_name      LIKE ?
+               OR b.mother_name      LIKE ?)";
+    $s = '%' . $search . '%';
+    $params = array_merge($params, [$s, $s, $s, $s, $s]);
 }
+
 if (!empty($filter_year)) {
-    $y = mysqli_real_escape_string($conn, $filter_year);
-    $sql .= " AND YEAR(b.date_of_birth) = '$y'";
+    $sql .= " AND YEAR(b.date_of_birth) = ?";
+    $params[] = $filter_year;
 }
 
 $sql .= " ORDER BY b.created_at DESC";
-$result = mysqli_query($conn, $sql);
-$records = [];
-while ($row = mysqli_fetch_assoc($result)) {
-    $records[] = $row;
-}
-$total = count($records);
+
+$stmt = $pdo->prepare($sql);
+$stmt->execute($params);
+$records = $stmt->fetchAll();
+$total   = count($records);
 
 // ── Get available years for filter ──
-$years_result = mysqli_query($conn, "SELECT DISTINCT YEAR(date_of_birth) as yr FROM birth_records ORDER BY yr DESC");
-$years = [];
-while ($y = mysqli_fetch_assoc($years_result)) {
-    $years[] = $y['yr'];
-}
+$yr_stmt = $pdo->query("SELECT DISTINCT YEAR(date_of_birth) as yr FROM birth_records ORDER BY yr DESC");
+$years   = $yr_stmt->fetchAll(PDO::FETCH_COLUMN);
 ?>
 <!DOCTYPE html>
 <html lang="en">
