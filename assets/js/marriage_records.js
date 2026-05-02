@@ -112,7 +112,7 @@ $('#btnSaveRecord').on('click', function () {
     const $btn = $(this);
     $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Saving...');
     $.ajax({
-        url: 'php/marriage_handler.php',
+        url: 'php/marriage_records.php',
         type: 'POST',
         data: new FormData(form),
         processData: false, contentType: false, dataType: 'json',
@@ -133,7 +133,7 @@ function viewRecord(id) {
     $('#viewModalBody').html('<p style="text-align:center;color:#aaa;"><i class="fas fa-spinner fa-spin"></i> Loading...</p>');
     openModal('viewModal');
     $.ajax({
-        url: 'php/marriage_handler.php?action=get&id=' + id,
+        url: 'php/marriage_records.php?action=get&id=' + id,
         type: 'GET', dataType: 'json',
         success: function (res) {
             if (res.status === 'success') {
@@ -170,7 +170,7 @@ function viewRecord(id) {
 // ── Edit Record ──
 function editRecord(id) {
     $.ajax({
-        url: 'php/marriage_handler.php?action=get&id=' + id,
+        url: 'php/marriage_records.php?action=get&id=' + id,
         type: 'GET', dataType: 'json',
         success: function (res) {
             if (res.status === 'success') {
@@ -210,7 +210,7 @@ $('#btnConfirmDelete').on('click', function () {
     const $btn = $(this);
     $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Deleting...');
     $.ajax({
-        url: 'php/marriage_handler.php',
+        url: 'php/marriage_records.php',
         type: 'POST',
         data: { action: 'delete', record_id: deleteId },
         dataType: 'json',
