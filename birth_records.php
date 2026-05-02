@@ -1,8 +1,5 @@
 <?php
-/* ============================================
-   LCR DIGITAL ARCHIVING SYSTEM - BIRTH RECORDS
-   Municipality of San Julian, Eastern Samar
-   ============================================ */
+
 
 require_once 'authentication/session.php';
 require_once 'authentication/db_connect.php';
